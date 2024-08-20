@@ -1,4 +1,6 @@
-using MyBlog.Client.Pages;
+using Data;
+using Data.Models.Interfaces;
+
 using MyBlog.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +9,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
+
+builder.Services.AddOptions<BlogApiJsonDirectAccessSetting>().
+Configure(options =>
+{
+    options.DataPath = @"..\..\Data\";
+    options.BlogPostsFolder = "Blogposts";
+    options.TagsFolder = "Tags";
+    options.CategoriesFolder = "Categories";
+    options.CommentsFolder = "Comments";
+});
+builder.Services.AddScoped<IBlogApi, BlogApiJsonDirectAccess>();
 
 var app = builder.Build();
 
@@ -30,6 +43,7 @@ app.UseAntiforgery();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(MyBlog.Client._Imports).Assembly);
+    .AddAdditionalAssemblies(typeof(MyBlog.Client._Imports).Assembly)
+    .AddAdditionalAssemblies(typeof(SharedComponents.Pages.Home).Assembly);
 
 app.Run();
